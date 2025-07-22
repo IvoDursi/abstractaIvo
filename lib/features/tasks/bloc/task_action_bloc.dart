@@ -25,6 +25,7 @@ class TaskActionBloc extends Bloc<TaskActionEvent, TaskActionState> {
       description: event.description,
       assignation: event.assignedTo,
       prompt: event.prompt,
+      tags: event.labels,
     );
     result.fold(
       (_) => emit(const TaskActionState.failed(error: 'Failed to add task')),
@@ -36,7 +37,9 @@ class TaskActionBloc extends Bloc<TaskActionEvent, TaskActionState> {
   }
 
   Future<void> _onRemoveTask(
-      RemoveTask event, Emitter<TaskActionState> emit) async {
+    RemoveTask event,
+    Emitter<TaskActionState> emit,
+  ) async {
     emit(const TaskActionState.loading());
 
     final current = state.maybeWhen(
@@ -55,7 +58,9 @@ class TaskActionBloc extends Bloc<TaskActionEvent, TaskActionState> {
   }
 
   Future<void> _onEditTask(
-      EditTask event, Emitter<TaskActionState> emit) async {
+    EditTask event,
+    Emitter<TaskActionState> emit,
+  ) async {
     emit(const TaskActionState.loading());
     final result = await abstractaRepository.editTask(
       taskId: event.taskId,
@@ -63,6 +68,7 @@ class TaskActionBloc extends Bloc<TaskActionEvent, TaskActionState> {
       description: event.description,
       status: event.status,
       assignedTo: event.assignedTo,
+      tags: event.labels,
     );
     result.fold(
       (_) => emit(const TaskActionState.failed(error: 'Failed to remove task')),

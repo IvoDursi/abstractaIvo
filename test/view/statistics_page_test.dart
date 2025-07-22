@@ -75,7 +75,6 @@ void main() {
     await tester.pumpWidget(makeTestableWidget(const StatisticsPage()));
     await tester.pump();
 
-    // Buscamos el texto exacto del l10n.emptyTasks
     final BuildContext context = tester.element(find.byType(StatisticsPage));
     final l10n = context.l10n;
 
@@ -95,10 +94,8 @@ void main() {
     await tester.pumpWidget(makeTestableWidget(const StatisticsPage()));
     await tester.pump(const Duration(seconds: 1));
 
-    // Verifico que aparece SfCartesianChart
     expect(find.byType(SfCartesianChart), findsOneWidget);
 
-    // Verifico texto con conteo
     expect(
       find.text('Tienes 5 tareas pendientes y 3 tareas completadas.'),
       findsOneWidget,

@@ -26,7 +26,7 @@ Map<String, dynamic> _$$TaskModelImplToJson(_$TaskModelImpl instance) =>
       'title': instance.title,
       'description': instance.description,
       'tags': instance.tags,
-      'status': _$TaskStatusEnumMap[instance.status]!,
+      'status': _$TaskStatusEnumMap[instance.status],
       'assignedTo': instance.assignedTo,
       'createdAt': instance.createdAt.toIso8601String(),
       'completedAt': instance.completedAt?.toIso8601String(),

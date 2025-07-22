@@ -95,4 +95,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get actionError => 'No se ha podido realizar la acción';
+
+  @override
+  String get tagsLabel => 'Etiquetas';
+
+  @override
+  String get tagsHint => 'Añadir etiquetas para identificar la tarea';
 }

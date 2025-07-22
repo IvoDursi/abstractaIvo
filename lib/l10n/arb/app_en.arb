@@ -28,5 +28,8 @@
   "iaMode": "IA Mode",
   "iaInstructions": "Instruction for AI",
   "iaInstructionsHint": "Describe what task you need to create...",
-  "actionError": "The action could not be performed"
+  "actionError": "The action could not be performed",
+  "tagsLabel": "Tags",
+  "tagsHint": "Add tags to identify the task"
+
 }

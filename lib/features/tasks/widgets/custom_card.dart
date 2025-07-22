@@ -14,20 +14,20 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusColor = ColorsUtils().getStatusColor(task.status);
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
         elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Row(
           children: [
             Container(
               width: 4,
               height: 100,
               decoration: BoxDecoration(
-                color: ColorsUtils().getStatusColor(task.status),
+                color: statusColor,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -45,9 +45,7 @@ class CustomCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: ColorsUtils()
-                                .getStatusColor(task.status)
-                                .withOpacity(0.1),
+                            color: statusColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -55,13 +53,11 @@ class CustomCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: ColorsUtils().getStatusColor(task.status),
+                              color: statusColor,
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
+                        const SizedBox(width: 5),
                         Text(
                           task.assignedTo,
                           style: const TextStyle(
@@ -72,10 +68,8 @@ class CustomCard extends StatelessWidget {
                         const Spacer(),
                         Text(
                           DateFormat.MMMd().format(task.createdAt),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
                     ),
@@ -83,17 +77,30 @@ class CustomCard extends StatelessWidget {
                     Text(
                       task.title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w600,
                         fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       task.description,
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(fontSize: 14),
                     ),
+                    if (task.tags.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: task.tags.map((tag) {
+                          return Chip(
+                            label: Text(tag),
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -113,6 +113,4 @@ app.*.map.json
 !.idea/dictionaries/
 !.idea/runConfigurations/
 
-# .env
-.env
 

@@ -20,10 +20,15 @@ mixin _$TaskActionEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String taskId) removeTask,
     required TResult Function(String? title, String? description,
-            String? prompt, String assignedTo)
+            String? prompt, String assignedTo, List<String> labels)
         addTask,
-    required TResult Function(String title, String description,
-            String assignedTo, TaskStatus status, String taskId)
+    required TResult Function(
+            String title,
+            String description,
+            String assignedTo,
+            TaskStatus status,
+            String taskId,
+            List<String> labels)
         editTask,
   }) =>
       throw _privateConstructorUsedError;
@@ -31,10 +36,10 @@ mixin _$TaskActionEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String taskId)? removeTask,
     TResult? Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult? Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
   }) =>
       throw _privateConstructorUsedError;
@@ -42,10 +47,10 @@ mixin _$TaskActionEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String taskId)? removeTask,
     TResult Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
     required TResult orElse(),
   }) =>
@@ -165,10 +170,15 @@ class _$RemoveTaskImpl implements RemoveTask {
   TResult when<TResult extends Object?>({
     required TResult Function(String taskId) removeTask,
     required TResult Function(String? title, String? description,
-            String? prompt, String assignedTo)
+            String? prompt, String assignedTo, List<String> labels)
         addTask,
-    required TResult Function(String title, String description,
-            String assignedTo, TaskStatus status, String taskId)
+    required TResult Function(
+            String title,
+            String description,
+            String assignedTo,
+            TaskStatus status,
+            String taskId,
+            List<String> labels)
         editTask,
   }) {
     return removeTask(taskId);
@@ -179,10 +189,10 @@ class _$RemoveTaskImpl implements RemoveTask {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String taskId)? removeTask,
     TResult? Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult? Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
   }) {
     return removeTask?.call(taskId);
@@ -193,10 +203,10 @@ class _$RemoveTaskImpl implements RemoveTask {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String taskId)? removeTask,
     TResult Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
     required TResult orElse(),
   }) {
@@ -260,7 +270,11 @@ abstract class _$$AddTaskImplCopyWith<$Res> {
       __$$AddTaskImplCopyWithImpl<$Res>;
   @useResult
   $Res call(
-      {String? title, String? description, String? prompt, String assignedTo});
+      {String? title,
+      String? description,
+      String? prompt,
+      String assignedTo,
+      List<String> labels});
 }
 
 /// @nodoc
@@ -280,6 +294,7 @@ class __$$AddTaskImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? prompt = freezed,
     Object? assignedTo = null,
+    Object? labels = null,
   }) {
     return _then(_$AddTaskImpl(
       title: freezed == title
@@ -298,6 +313,10 @@ class __$$AddTaskImplCopyWithImpl<$Res>
           ? _value.assignedTo
           : assignedTo // ignore: cast_nullable_to_non_nullable
               as String,
+      labels: null == labels
+          ? _value._labels
+          : labels // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -309,7 +328,9 @@ class _$AddTaskImpl implements AddTask {
       {required this.title,
       required this.description,
       required this.prompt,
-      required this.assignedTo});
+      required this.assignedTo,
+      required final List<String> labels})
+      : _labels = labels;
 
   @override
   final String? title;
@@ -319,10 +340,17 @@ class _$AddTaskImpl implements AddTask {
   final String? prompt;
   @override
   final String assignedTo;
+  final List<String> _labels;
+  @override
+  List<String> get labels {
+    if (_labels is EqualUnmodifiableListView) return _labels;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_labels);
+  }
 
   @override
   String toString() {
-    return 'TaskActionEvent.addTask(title: $title, description: $description, prompt: $prompt, assignedTo: $assignedTo)';
+    return 'TaskActionEvent.addTask(title: $title, description: $description, prompt: $prompt, assignedTo: $assignedTo, labels: $labels)';
   }
 
   @override
@@ -335,12 +363,13 @@ class _$AddTaskImpl implements AddTask {
                 other.description == description) &&
             (identical(other.prompt, prompt) || other.prompt == prompt) &&
             (identical(other.assignedTo, assignedTo) ||
-                other.assignedTo == assignedTo));
+                other.assignedTo == assignedTo) &&
+            const DeepCollectionEquality().equals(other._labels, _labels));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, description, prompt, assignedTo);
+  int get hashCode => Object.hash(runtimeType, title, description, prompt,
+      assignedTo, const DeepCollectionEquality().hash(_labels));
 
   /// Create a copy of TaskActionEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -355,13 +384,18 @@ class _$AddTaskImpl implements AddTask {
   TResult when<TResult extends Object?>({
     required TResult Function(String taskId) removeTask,
     required TResult Function(String? title, String? description,
-            String? prompt, String assignedTo)
+            String? prompt, String assignedTo, List<String> labels)
         addTask,
-    required TResult Function(String title, String description,
-            String assignedTo, TaskStatus status, String taskId)
+    required TResult Function(
+            String title,
+            String description,
+            String assignedTo,
+            TaskStatus status,
+            String taskId,
+            List<String> labels)
         editTask,
   }) {
-    return addTask(title, description, prompt, assignedTo);
+    return addTask(title, description, prompt, assignedTo, labels);
   }
 
   @override
@@ -369,13 +403,13 @@ class _$AddTaskImpl implements AddTask {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String taskId)? removeTask,
     TResult? Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult? Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
   }) {
-    return addTask?.call(title, description, prompt, assignedTo);
+    return addTask?.call(title, description, prompt, assignedTo, labels);
   }
 
   @override
@@ -383,15 +417,15 @@ class _$AddTaskImpl implements AddTask {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String taskId)? removeTask,
     TResult Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
     required TResult orElse(),
   }) {
     if (addTask != null) {
-      return addTask(title, description, prompt, assignedTo);
+      return addTask(title, description, prompt, assignedTo, labels);
     }
     return orElse();
   }
@@ -436,12 +470,14 @@ abstract class AddTask implements TaskActionEvent {
       {required final String? title,
       required final String? description,
       required final String? prompt,
-      required final String assignedTo}) = _$AddTaskImpl;
+      required final String assignedTo,
+      required final List<String> labels}) = _$AddTaskImpl;
 
   String? get title;
   String? get description;
   String? get prompt;
   String get assignedTo;
+  List<String> get labels;
 
   /// Create a copy of TaskActionEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -461,7 +497,8 @@ abstract class _$$EditTaskImplCopyWith<$Res> {
       String description,
       String assignedTo,
       TaskStatus status,
-      String taskId});
+      String taskId,
+      List<String> labels});
 }
 
 /// @nodoc
@@ -482,6 +519,7 @@ class __$$EditTaskImplCopyWithImpl<$Res>
     Object? assignedTo = null,
     Object? status = null,
     Object? taskId = null,
+    Object? labels = null,
   }) {
     return _then(_$EditTaskImpl(
       title: null == title
@@ -504,6 +542,10 @@ class __$$EditTaskImplCopyWithImpl<$Res>
           ? _value.taskId
           : taskId // ignore: cast_nullable_to_non_nullable
               as String,
+      labels: null == labels
+          ? _value._labels
+          : labels // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -516,7 +558,9 @@ class _$EditTaskImpl implements EditTask {
       required this.description,
       required this.assignedTo,
       required this.status,
-      required this.taskId});
+      required this.taskId,
+      required final List<String> labels})
+      : _labels = labels;
 
   @override
   final String title;
@@ -528,10 +572,17 @@ class _$EditTaskImpl implements EditTask {
   final TaskStatus status;
   @override
   final String taskId;
+  final List<String> _labels;
+  @override
+  List<String> get labels {
+    if (_labels is EqualUnmodifiableListView) return _labels;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_labels);
+  }
 
   @override
   String toString() {
-    return 'TaskActionEvent.editTask(title: $title, description: $description, assignedTo: $assignedTo, status: $status, taskId: $taskId)';
+    return 'TaskActionEvent.editTask(title: $title, description: $description, assignedTo: $assignedTo, status: $status, taskId: $taskId, labels: $labels)';
   }
 
   @override
@@ -545,12 +596,13 @@ class _$EditTaskImpl implements EditTask {
             (identical(other.assignedTo, assignedTo) ||
                 other.assignedTo == assignedTo) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId));
+            (identical(other.taskId, taskId) || other.taskId == taskId) &&
+            const DeepCollectionEquality().equals(other._labels, _labels));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, description, assignedTo, status, taskId);
+  int get hashCode => Object.hash(runtimeType, title, description, assignedTo,
+      status, taskId, const DeepCollectionEquality().hash(_labels));
 
   /// Create a copy of TaskActionEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -565,13 +617,18 @@ class _$EditTaskImpl implements EditTask {
   TResult when<TResult extends Object?>({
     required TResult Function(String taskId) removeTask,
     required TResult Function(String? title, String? description,
-            String? prompt, String assignedTo)
+            String? prompt, String assignedTo, List<String> labels)
         addTask,
-    required TResult Function(String title, String description,
-            String assignedTo, TaskStatus status, String taskId)
+    required TResult Function(
+            String title,
+            String description,
+            String assignedTo,
+            TaskStatus status,
+            String taskId,
+            List<String> labels)
         editTask,
   }) {
-    return editTask(title, description, assignedTo, status, taskId);
+    return editTask(title, description, assignedTo, status, taskId, labels);
   }
 
   @override
@@ -579,13 +636,14 @@ class _$EditTaskImpl implements EditTask {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String taskId)? removeTask,
     TResult? Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult? Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
   }) {
-    return editTask?.call(title, description, assignedTo, status, taskId);
+    return editTask?.call(
+        title, description, assignedTo, status, taskId, labels);
   }
 
   @override
@@ -593,15 +651,15 @@ class _$EditTaskImpl implements EditTask {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String taskId)? removeTask,
     TResult Function(String? title, String? description, String? prompt,
-            String assignedTo)?
+            String assignedTo, List<String> labels)?
         addTask,
     TResult Function(String title, String description, String assignedTo,
-            TaskStatus status, String taskId)?
+            TaskStatus status, String taskId, List<String> labels)?
         editTask,
     required TResult orElse(),
   }) {
     if (editTask != null) {
-      return editTask(title, description, assignedTo, status, taskId);
+      return editTask(title, description, assignedTo, status, taskId, labels);
     }
     return orElse();
   }
@@ -647,13 +705,15 @@ abstract class EditTask implements TaskActionEvent {
       required final String description,
       required final String assignedTo,
       required final TaskStatus status,
-      required final String taskId}) = _$EditTaskImpl;
+      required final String taskId,
+      required final List<String> labels}) = _$EditTaskImpl;
 
   String get title;
   String get description;
   String get assignedTo;
   TaskStatus get status;
   String get taskId;
+  List<String> get labels;
 
   /// Create a copy of TaskActionEvent
   /// with the given fields replaced by the non-null parameter values.

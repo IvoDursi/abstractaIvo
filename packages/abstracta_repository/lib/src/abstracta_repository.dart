@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:abstracta_repository/i_abstracta_repository.dart';
 import 'package:abstracta_repository/model/task_model.dart';
 import 'package:dartz/dartz.dart';
+import 'package:gemini_service/i_gemini_service.dart';
 import 'package:local_storage_service/local_storage_service.dart';
 import 'package:local_storage_service/resources/keys.dart';
-import 'package:gemini_service/i_gemini_service.dart';
 
 /// {@template abstracta_repository}
 /// Abstracta Repository
@@ -21,6 +21,7 @@ class AbstractaRepository extends IAbstractaRepository {
 
   final _tasksController = StreamController<List<TaskModel>>.broadcast();
 
+  @override
   Stream<List<TaskModel>> get onTasksChanged => _tasksController.stream;
 
   @override
@@ -59,6 +60,7 @@ class AbstractaRepository extends IAbstractaRepository {
     required String? description,
     required String? title,
     required String? prompt,
+    required List<String>? tags,
   }) async {
     final currentTasksEither = await getTasks();
 
@@ -83,7 +85,7 @@ class AbstractaRepository extends IAbstractaRepository {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: promptResponse['title'].toString(),
         description: promptResponse['description'].toString(),
-        tags: const [],
+        tags: tags ?? [],
         status: TaskStatus.pending,
         assignedTo: assignation,
         createdAt: DateTime.now(),
@@ -93,7 +95,7 @@ class AbstractaRepository extends IAbstractaRepository {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: title,
         description: description,
-        tags: const [],
+        tags: tags ?? [],
         status: TaskStatus.pending,
         assignedTo: assignation,
         createdAt: DateTime.now(),
@@ -159,6 +161,7 @@ class AbstractaRepository extends IAbstractaRepository {
     required String title,
     required String description,
     required String assignedTo,
+    required List<String> tags,
     required TaskStatus status,
   }) async {
     final currentTasksEither = await getTasks();
@@ -173,6 +176,7 @@ class AbstractaRepository extends IAbstractaRepository {
               description: description,
               status: status,
               assignedTo: assignedTo,
+              tags: tags,
             );
           }
           return task;

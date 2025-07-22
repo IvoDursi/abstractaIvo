@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:abstracta_ivo/app/utils/utils.dart';
 import 'package:abstracta_ivo/features/features.dart';
+import 'package:abstracta_ivo/l10n/arb/app_localizations.dart';
 import 'package:abstracta_ivo/l10n/l10n.dart';
 import 'package:abstracta_repository/model/task_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,10 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddOrEditTaskModal extends StatefulWidget {
-  const AddOrEditTaskModal({
-    super.key,
-    this.existingTask,
-  });
+  const AddOrEditTaskModal({super.key, this.existingTask});
   final TaskModel? existingTask;
 
   @override
@@ -21,74 +18,87 @@ class AddOrEditTaskModal extends StatefulWidget {
 
 class _AddOrEditTaskModalState extends State<AddOrEditTaskModal> {
   final _formKey = GlobalKey<FormState>();
-
   late final TextEditingController _titleCtrl;
   late final TextEditingController _descCtrl;
-  late final TextEditingController _assignationCtrl;
+  late final TextEditingController _assignCtrl;
+  late final TextEditingController _aiPromptCtrl;
+  final TextEditingController _tagInputCtrl = TextEditingController();
   late TaskStatus _status;
-  final TextEditingController _aiPromptCtrl = TextEditingController();
-  bool _useAiMode = true;
+  bool _useAi = true;
+
+  List<String> _tags = [];
 
   bool get isEditing => widget.existingTask != null;
 
   @override
   void initState() {
     super.initState();
-    _titleCtrl = TextEditingController(text: widget.existingTask?.title ?? '');
-    _descCtrl =
-        TextEditingController(text: widget.existingTask?.description ?? '');
-    _assignationCtrl =
-        TextEditingController(text: widget.existingTask?.assignedTo ?? '');
-
-    _status = widget.existingTask?.status ?? TaskStatus.pending;
+    final t = widget.existingTask;
+    _titleCtrl = TextEditingController(text: t?.title ?? '');
+    _descCtrl = TextEditingController(text: t?.description ?? '');
+    _assignCtrl = TextEditingController(text: t?.assignedTo ?? '');
+    _aiPromptCtrl = TextEditingController();
+    _status = t?.status ?? TaskStatus.pending;
+    if (t != null) {
+      _tags = List.from(t.tags);
+    }
   }
 
   @override
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
-    _assignationCtrl.dispose();
+    _assignCtrl.dispose();
     _aiPromptCtrl.dispose();
+    _tagInputCtrl.dispose();
     super.dispose();
+  }
+
+  void _addTag(String raw) {
+    final tag = raw.trim();
+    if (tag.isEmpty || _tags.contains(tag)) return;
+    setState(() => _tags.add(tag));
+    _tagInputCtrl.clear();
   }
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-
+    final bloc = context.read<TaskActionBloc>();
     final title = _titleCtrl.text.trim();
-    final assignation = _assignationCtrl.text.trim();
     final description = _descCtrl.text.trim();
+    final assignedTo = _assignCtrl.text.trim();
     final prompt = _aiPromptCtrl.text.trim();
 
     if (isEditing) {
-      context.read<TaskActionBloc>().add(
-            TaskActionEvent.editTask(
-              title: title,
-              description: description,
-              status: _status,
-              taskId: widget.existingTask!.id,
-              assignedTo: assignation,
-            ),
-          );
+      bloc.add(
+        TaskActionEvent.editTask(
+          title: title,
+          description: description,
+          status: _status,
+          taskId: widget.existingTask!.id,
+          assignedTo: assignedTo,
+          labels: _tags,
+        ),
+      );
     } else {
-      context.read<TaskActionBloc>().add(
-            TaskActionEvent.addTask(
-              title: title,
-              description: description,
-              assignedTo: assignation,
-              prompt: prompt,
-            ),
-          );
+      bloc.add(
+        TaskActionEvent.addTask(
+          title: title,
+          description: description,
+          assignedTo: assignedTo,
+          prompt: prompt,
+          labels: _tags,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+      padding: const EdgeInsets.only(
+        bottom: 26,
         left: 16,
         right: 16,
         top: 16,
@@ -97,256 +107,216 @@ class _AddOrEditTaskModalState extends State<AddOrEditTaskModal> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isEditing ? l10n.editTaskTitle : l10n.createTaskTitle,
-                  style: const TextStyle(fontSize: 22),
-                ),
-                if (!isEditing)
-                  Row(
-                    children: [
-                      Text(
-                        l10n.iaMode,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: _useAiMode ? Colors.green : Colors.grey,
-                        ),
-                      ),
-                      if (Platform.isIOS)
-                        CupertinoSwitch(
-                          value: _useAiMode,
-                          onChanged: (value) {
-                            setState(() {
-                              _useAiMode = value;
-                            });
-                          },
-                        )
-                      else
-                        Switch(
-                          value: _useAiMode,
-                          onChanged: (value) {
-                            setState(() {
-                              _useAiMode = value;
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-              ],
-            ),
+            _buildHeader(l10n),
             const SizedBox(height: 16),
-            if (isEditing)
-              DropdownButtonFormField<TaskStatus>(
-                value: _status,
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _status = newValue;
-                    });
-                  }
-                },
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: ColorsUtils().getStatusColor(_status),
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  labelText: l10n.statusLabel,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-                items: TaskStatus.values.map((option) {
-                  return DropdownMenuItem(
-                    value: option,
-                    child: Text(
-                      StringUtils().capitalize(option.name),
-                      style: TextStyle(
-                        color: ColorsUtils().getStatusColor(option),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
             if (isEditing) ...[
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: InputDecoration(labelText: l10n.titleLabel),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.titleRequired;
-                  }
-                  return null;
-                },
-              ),
+              _buildStatusDropdown(l10n),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _descCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.descriptionLabel,
-                  border: const OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                keyboardType: TextInputType.multiline,
-                minLines: 3,
-                maxLines: null,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.descriptionRequired;
-                  }
-                  return null;
-                },
-              ),
-            ] else if (!_useAiMode) ...[
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: InputDecoration(labelText: l10n.titleLabel),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.titleRequired;
-                  }
-                  return null;
-                },
-              ),
+            ],
+            if (!isEditing && _useAi) ...[
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _descCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.descriptionLabel,
-                  border: const OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                keyboardType: TextInputType.multiline,
-                minLines: 3,
-                maxLines: null,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.descriptionRequired;
-                  }
-                  return null;
-                },
+              _buildTextField(
+                _aiPromptCtrl,
+                l10n.iaInstructions,
+                multiline: true,
+                validator: l10n.descriptionRequired,
               ),
             ] else ...[
-              TextFormField(
-                controller: _aiPromptCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.iaInstructions,
-                  hintText: l10n.iaInstructionsHint,
-                  border: const OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                keyboardType: TextInputType.multiline,
-                minLines: 4,
-                maxLines: null,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.descriptionRequired;
-                  }
-                  return null;
-                },
+              _buildTextField(
+                _titleCtrl,
+                l10n.titleLabel,
+                validator: l10n.titleRequired,
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                _descCtrl,
+                l10n.descriptionLabel,
+                multiline: true,
+                validator: l10n.descriptionRequired,
               ),
             ],
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _assignationCtrl,
-              decoration: InputDecoration(labelText: l10n.assignedTo),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.assignationRequired;
-                }
-                return null;
-              },
+            _buildTagsField(l10n),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: _tags.map((tag) => Chip(label: Text(tag))).toList(),
             ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              _assignCtrl,
+              l10n.assignedTo,
+              validator: l10n.assignationRequired,
+            ),
+            const SizedBox(height: 24),
+            _buildSubmitButton(l10n),
+            if (isEditing) _buildDeleteButton(l10n),
             const SizedBox(height: 16),
-            Center(
-              child: BlocConsumer<TaskActionBloc, TaskActionState>(
-                listener: (context, state) {
-                  if (state is ActionSucceded) Navigator.pop(context);
-                  if (state is ActionFailed) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.actionError),
-                        backgroundColor: Colors.red,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                builder: (context, state) {
-                  return SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: state is ActionLoading ? null : _submit,
-                      child: state is ActionLoading
-                          ? const SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: CircularProgressIndicator(),
-                            )
-                          : Text(
-                              isEditing ? l10n.saveChanges : l10n.createTask,
-                            ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            if (isEditing)
-              Center(
-                child: TextButton.icon(
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: Text(l10n.deleteTaskQuestion),
-                        content: Text(
-                          l10n.deleteTaskDescription,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(l10n.cancel),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red,
-                            ),
-                            child: Text(l10n.delete),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm ?? false) {
-                      context.read<TaskActionBloc>().add(
-                            TaskActionEvent.removeTask(
-                              taskId: widget.existingTask!.id,
-                            ),
-                          );
-                    }
-                  },
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  label: Text(
-                    l10n.deleteTask,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              ),
-            const SizedBox(height: 36),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          isEditing ? l10n.editTaskTitle : l10n.createTaskTitle,
+          style: const TextStyle(fontSize: 22),
+        ),
+        if (!isEditing)
+          Row(
+            children: [
+              Text(
+                l10n.iaMode,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _useAi ? Colors.green : Colors.grey,
+                ),
+              ),
+              if (Platform.isIOS)
+                CupertinoSwitch(
+                  value: _useAi,
+                  onChanged: (v) => setState(() => _useAi = v),
+                )
+              else
+                Switch(
+                  value: _useAi,
+                  onChanged: (v) => setState(() => _useAi = v),
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStatusDropdown(AppLocalizations l10n) {
+    return DropdownButtonFormField<TaskStatus>(
+      value: _status,
+      onChanged: (v) => setState(() => _status = v!),
+      decoration: InputDecoration(
+        labelText: l10n.statusLabel,
+        filled: true,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      items: TaskStatus.values.map((s) {
+        return DropdownMenuItem(
+          value: s,
+          child: Text(
+            StringUtils().capitalize(s.name),
+            style: TextStyle(color: ColorsUtils().getStatusColor(s)),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController ctrl,
+    String label, {
+    String? hint,
+    bool multiline = false,
+    String? validator,
+  }) {
+    return TextFormField(
+      controller: ctrl,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: const OutlineInputBorder(),
+        alignLabelWithHint: multiline,
+      ),
+      keyboardType: multiline ? TextInputType.multiline : TextInputType.text,
+      textInputAction:
+          multiline ? TextInputAction.newline : TextInputAction.next,
+      minLines: multiline ? 3 : 1,
+      maxLines: multiline ? null : 1,
+      validator: validator == null
+          ? null
+          : (v) => (v == null || v.trim().isEmpty) ? validator : null,
+    );
+  }
+
+  Widget _buildTagsField(AppLocalizations l10n) {
+    return TextFormField(
+      controller: _tagInputCtrl,
+      decoration: InputDecoration(
+        labelText: l10n.tagsLabel,
+        hintText: l10n.tagsHint,
+        border: const OutlineInputBorder(),
+      ),
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: _addTag,
+    );
+  }
+
+  Widget _buildSubmitButton(AppLocalizations l10n) {
+    return BlocConsumer<TaskActionBloc, TaskActionState>(
+      listener: (ctx, state) {
+        if (state is ActionSucceded) Navigator.pop(ctx);
+        if (state is ActionFailed) {
+          ScaffoldMessenger.of(ctx).showSnackBar(
+            SnackBar(
+              content: Text(l10n.actionError),
+              backgroundColor: Colors.red,
+            ),
+          );
+          Navigator.pop(ctx);
+        }
+      },
+      builder: (ctx, state) {
+        final loading = state is ActionLoading;
+        return SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton(
+            onPressed: loading ? null : _submit,
+            child: loading
+                ? const SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: CircularProgressIndicator(),
+                  )
+                : Text(isEditing ? l10n.saveChanges : l10n.createTask),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDeleteButton(AppLocalizations l10n) {
+    return TextButton.icon(
+      onPressed: () async {
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(l10n.deleteTaskQuestion),
+            content: Text(l10n.deleteTaskDescription),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(l10n.delete),
+              ),
+            ],
+          ),
+        );
+        if (ok ?? false) {
+          context
+              .read<TaskActionBloc>()
+              .add(TaskActionEvent.removeTask(taskId: widget.existingTask!.id));
+        }
+      },
+      icon: const Icon(Icons.delete_outline, color: Colors.red),
+      label: Text(l10n.deleteTask, style: const TextStyle(color: Colors.red)),
     );
   }
 }

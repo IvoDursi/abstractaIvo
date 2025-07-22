@@ -14,6 +14,7 @@ class TaskActionEvent with _$TaskActionEvent {
     required String? description,
     required String? prompt,
     required String assignedTo,
+    required List<String> labels,
   }) = AddTask;
 
   const factory TaskActionEvent.editTask({
@@ -22,5 +23,6 @@ class TaskActionEvent with _$TaskActionEvent {
     required String assignedTo,
     required TaskStatus status,
     required String taskId,
+    required List<String> labels,
   }) = EditTask;
 }

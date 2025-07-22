@@ -13,6 +13,7 @@ abstract class IAbstractaRepository {
     required String? description,
     required String? title,
     required String? prompt,
+    required List<String>? tags,
   });
 
   Future<Either<void, void>> removeTask(String taskId);
@@ -22,6 +23,7 @@ abstract class IAbstractaRepository {
     required String title,
     required String description,
     required String assignedTo,
+    required List<String> tags,
     required TaskStatus status,
   });
 

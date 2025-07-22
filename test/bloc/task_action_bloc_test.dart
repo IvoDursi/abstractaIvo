@@ -44,6 +44,7 @@ void main() {
             description: any(named: 'description'),
             assignation: any(named: 'assignation'),
             prompt: any(named: 'prompt'),
+            tags: [],
           ),
         ).thenAnswer((_) async => Right(fakeTask));
         return bloc;
@@ -54,6 +55,7 @@ void main() {
           description: 'Description',
           assignedTo: 'user_123',
           prompt: 'Prompt',
+          labels: [],
         ),
       ),
       expect: () => [
@@ -71,6 +73,7 @@ void main() {
             description: any(named: 'description'),
             assignation: any(named: 'assignation'),
             prompt: any(named: 'prompt'),
+            tags: [],
           ),
         ).thenAnswer((_) async => const Left('error'));
         return bloc;
@@ -81,6 +84,7 @@ void main() {
           description: 'Description',
           assignedTo: 'user_123',
           prompt: 'Prompt',
+          labels: [],
         ),
       ),
       expect: () => [
@@ -128,6 +132,7 @@ void main() {
             description: any(named: 'description'),
             status: any(named: 'status'),
             assignedTo: any(named: 'assignedTo'),
+            tags: [],
           ),
         ).thenAnswer((_) async => Right([fakeTask]));
         return bloc;
@@ -139,6 +144,7 @@ void main() {
           description: 'Updated',
           status: TaskStatus.completed,
           assignedTo: 'user_123',
+          labels: [],
         ),
       ),
       expect: () => [
@@ -157,6 +163,7 @@ void main() {
             description: any(named: 'description'),
             status: any(named: 'status'),
             assignedTo: any(named: 'assignedTo'),
+            tags: [],
           ),
         ).thenAnswer((_) async => const Left('error'));
         return bloc;
@@ -168,6 +175,7 @@ void main() {
           description: 'Updated',
           status: TaskStatus.completed,
           assignedTo: 'user_123',
+          labels: [],
         ),
       ),
       expect: () => [

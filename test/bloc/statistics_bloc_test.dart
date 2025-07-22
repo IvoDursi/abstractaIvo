@@ -21,11 +21,9 @@ void main() {
 
   group('StatisticsBloc', () {
     test('emits [loading, failed] when repository returns Left (error)', () {
-      // Arrange: el repositorio devuelve Left (error)
       when(() => mockRepository.getStatistics())
           .thenAnswer((_) async => Left('error'));
 
-      // Assert later los estados
       final expectedStates = [
         const StatisticsState.loading(),
         const StatisticsState.failed(error: 'Failed to fetch statistics'),
@@ -33,7 +31,6 @@ void main() {
 
       expectLater(statisticsBloc.stream, emitsInOrder(expectedStates));
 
-      // Act
       statisticsBloc.add(const GetStatistics());
     });
 
@@ -42,7 +39,6 @@ void main() {
         () {
       const stats = (10, 5);
 
-      // Arrange: repositorio devuelve Right con estadísticas
       when(() => mockRepository.getStatistics())
           .thenAnswer((_) async => const Right(stats));
 
@@ -53,7 +49,6 @@ void main() {
 
       expectLater(statisticsBloc.stream, emitsInOrder(expectedStates));
 
-      // Act
       statisticsBloc.add(const GetStatistics());
     });
   });
