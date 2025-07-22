@@ -107,6 +107,7 @@ class _AddOrEditTaskModalState extends State<AddOrEditTaskModal> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(l10n),
             const SizedBox(height: 16),
@@ -289,34 +290,35 @@ class _AddOrEditTaskModalState extends State<AddOrEditTaskModal> {
   }
 
   Widget _buildDeleteButton(AppLocalizations l10n) {
-    return TextButton.icon(
-      onPressed: () async {
-        final ok = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text(l10n.deleteTaskQuestion),
-            content: Text(l10n.deleteTaskDescription),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: Text(l10n.delete),
-              ),
-            ],
-          ),
-        );
-        if (ok ?? false) {
-          context
-              .read<TaskActionBloc>()
-              .add(TaskActionEvent.removeTask(taskId: widget.existingTask!.id));
-        }
-      },
-      icon: const Icon(Icons.delete_outline, color: Colors.red),
-      label: Text(l10n.deleteTask, style: const TextStyle(color: Colors.red)),
+    return Center(
+      child: TextButton.icon(
+        onPressed: () async {
+          final ok = await showDialog<bool>(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text(l10n.deleteTaskQuestion),
+              content: Text(l10n.deleteTaskDescription),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: Text(l10n.delete),
+                ),
+              ],
+            ),
+          );
+          if (ok ?? false) {
+            context.read<TaskActionBloc>().add(
+                TaskActionEvent.removeTask(taskId: widget.existingTask!.id));
+          }
+        },
+        icon: const Icon(Icons.delete_outline, color: Colors.red),
+        label: Text(l10n.deleteTask, style: const TextStyle(color: Colors.red)),
+      ),
     );
   }
 }

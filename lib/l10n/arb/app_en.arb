@@ -30,6 +30,7 @@
   "iaInstructionsHint": "Describe what task you need to create...",
   "actionError": "The action could not be performed",
   "tagsLabel": "Tags",
-  "tagsHint": "Add tags to identify the task"
+  "tagsHint": "Add tags to identify the task",
+  "taskSummary": "You have {pending} pending tasks and {completed} completed tasks."
 
 }

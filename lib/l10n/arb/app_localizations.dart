@@ -283,6 +283,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add tags to identify the task'**
   String get tagsHint;
+
+  /// No description provided for @taskSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {pending} pending tasks and {completed} completed tasks.'**
+  String taskSummary(Object completed, Object pending);
 }
 
 class _AppLocalizationsDelegate

@@ -41,19 +41,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 );
               }
 
-              final data = [
-                _TaskData(
-                  label: l10n.pending,
-                  value: pending,
-                  color: Colors.orange,
-                ),
-                _TaskData(
-                  label: l10n.completed,
-                  value: completed,
-                  color: Colors.green,
-                ),
-              ];
-
               return Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -64,8 +51,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         primaryXAxis: const CategoryAxis(),
                         tooltipBehavior: TooltipBehavior(enable: true),
                         series: [
-                          ColumnSeries<_TaskData, String>(
-                            dataSource: data,
+                          ColumnSeries<TaskData, String>(
+                            dataSource: [
+                              TaskData(
+                                label: l10n.pending,
+                                value: pending,
+                                color: Colors.orange,
+                              ),
+                              TaskData(
+                                label: l10n.completed,
+                                value: completed,
+                                color: Colors.green,
+                              ),
+                            ],
                             xValueMapper: (datum, _) => datum.label,
                             yValueMapper: (datum, _) => datum.value,
                             pointColorMapper: (datum, _) => datum.color,
@@ -77,7 +75,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Tienes $pending tareas pendientes y $completed tareas completadas.',
+                      l10n.taskSummary(
+                        completed,
+                        pending,
+                      ),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -95,8 +96,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 }
 
-class _TaskData {
-  _TaskData({
+class TaskData {
+  TaskData({
     required this.label,
     required this.value,
     required this.color,

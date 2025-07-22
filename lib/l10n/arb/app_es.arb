@@ -30,6 +30,7 @@
   "iaInstructionsHint": "Describe qué tarea necesitas crear...",
   "actionError": "No se ha podido realizar la acción",
   "tagsLabel": "Etiquetas",
-  "tagsHint": "Añadir etiquetas para identificar la tarea"
+  "tagsHint": "Añadir etiquetas para identificar la tarea",
+  "taskSummary": "Tienes {pending} tareas pendientes y {completed} tareas completadas."
 
 }

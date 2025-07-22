@@ -101,4 +101,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagsHint => 'Add tags to identify the task';
+
+  @override
+  String taskSummary(Object completed, Object pending) {
+    return 'You have $pending pending tasks and $completed completed tasks.';
+  }
 }

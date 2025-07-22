@@ -101,4 +101,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tagsHint => 'Añadir etiquetas para identificar la tarea';
+
+  @override
+  String taskSummary(Object completed, Object pending) {
+    return 'Tienes $pending tareas pendientes y $completed tareas completadas.';
+  }
 }
