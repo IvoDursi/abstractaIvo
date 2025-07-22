@@ -1,0 +1,43 @@
+name: abstracta_ivo
+description: A Very Good Project created by Very Good CLI.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  bloc: ^8.1.4
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  freezed_annotation: ^2.4.1
+  dartz: ^0.10.1
+  syncfusion_flutter_charts: ^30.1.40
+  abstracta_repository:
+    path: packages/abstracta_repository
+  local_storage_service:
+    path: packages/local_storage_service
+  gemini_service:
+    path: packages/gemini_service
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  bloc_test: ^9.1.7
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^6.0.0
+  freezed: ^2.4.5
+  build_runner: ^2.4.6
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - .env
+
+
